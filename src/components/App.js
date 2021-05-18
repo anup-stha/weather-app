@@ -11,7 +11,12 @@ import { months, days } from "./date";
 
 const MainWrapper = styled.div`
   min-height: 100vh;
-  background: black;
+  background: rgb(18, 16, 55);
+  background: linear-gradient(
+    90deg,
+    rgba(18, 16, 55, 1) 0%,
+    rgba(13, 13, 79, 1) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
