@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import SearchCity from "./SearchCity";
-import device from "../responsive/Device";
+// import device from "../responsive/Device";
 import Result from "./Result";
 import NotFound from "./NotFound";
 

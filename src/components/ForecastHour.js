@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import SmallLabel from "./SmallLabel";
 import Text from "./Text";
 import device from "../responsive/Device";
-import Tilt from "./TIlt";
 
 const ForecastWrapper = styled.div`
   padding: 10px;
@@ -39,11 +38,6 @@ const WeatherIcon = styled.img`
   width: 50px;
   margin: 0 auto;
 `;
-const options = {
-  scale: 2,
-  speed: 1000,
-  max: 30,
-};
 
 const ForecastHour = (props) => {
   const { temp, month, day, hour, icon } = props;

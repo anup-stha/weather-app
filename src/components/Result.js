@@ -17,10 +17,8 @@ import device from "../responsive/Device";
 import ForecastHour from "./ForecastHour";
 import ResultFadeIn from "./ResultFadeIn";
 import BigLabel from "./BigLabel";
-import MediumLabel from "./MediumLabel";
 import SmallLabel from "./SmallLabel";
 import Text from "./Text";
-import VanillaTilt from "vanilla-tilt";
 import Carousel from "react-elastic-carousel";
 
 const Results = styled.div`
@@ -164,19 +162,19 @@ const ForecastWrapper = styled.div`
   overflow: hidden;
 `;
 
-const Forecast = styled.div`
-  position: relative;
-  display: flex;
-  overflow-x: hidden;
-  overflow-y: hidden;
-  scrollbar-color: lightgray #ffffff;
-  scrollbar-width: thin;
-  margin-top: 20px;
+// const Forecast = styled.div`
+//   position: relative;
+//   display: flex;
+//   overflow-x: hidden;
+//   overflow-y: hidden;
+//   scrollbar-color: lightgray #ffffff;
+//   scrollbar-width: thin;
+//   margin-top: 20px;
 
-  @media ${device.laptop} {
-    order: 4;
-  }
-`;
+//   @media ${device.laptop} {
+//     order: 4;
+//   }
+// `;
 
 const Result = ({ weather }) => {
   const {
