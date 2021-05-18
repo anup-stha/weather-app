@@ -11,3 +11,14 @@
   margin: 0 auto;
   position: relative;
 }
+
+.rec .rec-dot {
+  background: transparent;
+  box-shadow: 0 0 1px 2px white;
+  height: 6px;
+  width: 6px;
+}
+
+.rec .rec-dot_active {
+  box-shadow: 0 0 1px 2px #1900ff;
+}

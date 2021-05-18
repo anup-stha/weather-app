@@ -1,4 +1,4 @@
-import { keyframes } from 'styled-components';
+import { keyframes } from "styled-components";
 
 const ResultFadeIn = keyframes`
   to {
@@ -6,6 +6,7 @@ const ResultFadeIn = keyframes`
         visibility: visible;
         top: 0;
   }
+  
 `;
 
 export default ResultFadeIn;

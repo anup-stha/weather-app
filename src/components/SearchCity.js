@@ -6,11 +6,10 @@ import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import device from "../responsive/Device";
 
 const SearchBar = styled.form`
-  top: ${({ showResult }) => (showResult ? "0%" : "30%")};
   position: relative;
-  margin: 0 auto;
-  max-width: 500px;
-  width: 50%;
+  max-width: 400px;
+  width: 80%;
+
   transition: 0.8s 0.5s;
   @keyframes grow {
     0% {
@@ -21,12 +20,12 @@ const SearchBar = styled.form`
     }
   }
   animation: 1s ease grow;
-  @media ${device.laptopL} {
+  /* @media ${device.laptopL} {
     max-width: 600px;
   }
   @media ${device.desktop} {
     max-width: 700px;
-  }
+  } */
 `;
 
 const SearchInput = styled.input`
@@ -36,7 +35,7 @@ const SearchInput = styled.input`
   font-size: 16px;
   padding: 10px 15px 10px 40px;
   color: #c5c5c5;
-  transition: 0.2s;
+  transition: 3s;
   border-radius: 20px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -56,11 +55,9 @@ const SearchInput = styled.input`
 `;
 
 const SearchIcon = styled.span`
-  display: block;
   position: absolute;
-  top: 50%;
-  left: 22px;
-  transform: translate(-50%, -50%);
+  top: ${(props) => (props.showResult ? "34%" : "34%")};
+  left: 16px;
   height: 14px;
   width: 14px;
   font-size: 14px;
@@ -87,7 +84,7 @@ const SearchCity = ({ submit, value, change, showResult }) => {
           placeholder="Enter city"
           onChange={change}
         />
-        <SearchIcon>
+        <SearchIcon showResult={showResult}>
           <FontAwesomeIcon icon={faSearch} />
         </SearchIcon>
       </SearchBar>

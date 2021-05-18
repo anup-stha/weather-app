@@ -1,17 +1,21 @@
-import React from 'react';
-import styled from 'styled-components';
-import PropTypes from 'prop-types';
-import SmallLabel from './SmallLabel';
-import Text from './Text';
-import device from '../responsive/Device';
+import React from "react";
+import styled from "styled-components";
+import PropTypes from "prop-types";
+import SmallLabel from "./SmallLabel";
+import Text from "./Text";
+import device from "../responsive/Device";
+import Tilt from "./TIlt";
 
 const ForecastWrapper = styled.div`
-  flex-shrink: 0;
-  flex-basis: 90px;
   padding: 10px;
   margin: 0 5px;
   border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background: rgba(186, 186, 186, 0.5);
+  box-shadow: 0 4px 8px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   &:first-child {
     margin-left: 0;
   }
@@ -35,8 +39,13 @@ const WeatherIcon = styled.img`
   width: 50px;
   margin: 0 auto;
 `;
+const options = {
+  scale: 2,
+  speed: 1000,
+  max: 30,
+};
 
-const ForecastHour = props => {
+const ForecastHour = (props) => {
   const { temp, month, day, hour, icon } = props;
   const iconUrl = `https://openweathermap.org/img/w/${icon}.png`;
 

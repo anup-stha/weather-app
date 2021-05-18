@@ -2,6 +2,7 @@ import React from "react";
 import "./Result.sass";
 import PropTypes from "prop-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Tilt from "./TIlt";
 import {
   faCloud,
   faBolt,
@@ -19,34 +20,37 @@ import BigLabel from "./BigLabel";
 import MediumLabel from "./MediumLabel";
 import SmallLabel from "./SmallLabel";
 import Text from "./Text";
+import VanillaTilt from "vanilla-tilt";
+import Carousel from "react-elastic-carousel";
 
 const Results = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-rows: 1fr;
-  gap: 10px 10px;
+  grid-template-columns: 1.2fr 0.8fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 0px 10px;
   margin: 10px;
-  grid-template-areas: "city des details details";
+
   animation: ${ResultFadeIn} 0.5s 1.4s forwards;
   height: 100%;
+  grid-template-areas:
+    "city des details details"
+    "hour hour hour hour";
 `;
 
 const CityDateWrapper = styled.div`
-  grid-area: city;
   display: flex;
   justify-content: center;
-  align-items: center;
   flex-direction: column;
-s
+  flex-basis: 100%;
+  height: 200px;
+  padding-left: 10px;
   gap: 6px;
-
-  background: rgba(227, 227, 227, 0);
-  box-shadow: 0 2px 4px 0 rgba(31, 38, 135, 0.37);
+  background: rgba(186, 186, 186, 0.5);
+  box-shadow: 0 4px 8px 0 rgba(31, 38, 135, 0.37);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 1rem;
   @media ${device.mobileL} {
     flex-basis: 50%;
     padding-right: 10px;
@@ -60,18 +64,19 @@ s
 const CurrentWeatherWrapper = styled.div`
   grid-area: des;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-
+  height: 200px;
+  flex-basis: 100%;
   padding: 0px 10px;
   gap: 20px;
-  background: rgba(227, 227, 227, 0);
-  box-shadow: 0 2px 4px 0 rgba(31, 38, 135, 0.37);
+  background: rgba(186, 186, 186, 0.5);
+  box-shadow: 0 4px 8px 0 rgba(31, 38, 135, 0.37);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 1rem;
   @media ${device.mobileL} {
     flex-basis: 50%;
     padding-right: 10px;
@@ -122,20 +127,15 @@ const Temperature = styled.h3`
 `;
 
 const WeatherDetailsWrapper = styled.div`
-  grid-area: details;
-
   display: flex;
+  height: 200px;
+  width: 100%;
+  justify-content: space-evenly;
+  align-items: center;
   flex-wrap: wrap;
-  padding: 10px 0;
+  padding: 0px 0;
+  gap: 10px;
 
-  background: rgba(227, 227, 227, 0);
-  box-shadow: 0 2px 4px 0 rgba(31, 38, 135, 0.37);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 10px;
-  align-self: flex-start;
   @media ${device.mobileL} {
     flex-basis: 50%;
   }
@@ -144,26 +144,35 @@ const WeatherDetailsWrapper = styled.div`
 const WeatherDetail = styled.div`
   flex-basis: calc(100% / 3);
   padding: 10px;
+  height: 90px;
+  width: 140px;
+  background: rgba(186, 186, 186, 0.5);
+  box-shadow: 0 4px 8px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   @media ${device.laptop} {
-    padding: 20px 10px;
+    padding: 10px 10px;
   }
 `;
 
 const ForecastWrapper = styled.div`
+  grid-area: hour;
   flex-basis: 100%;
-  margin: 20px 0;
+
   overflow: hidden;
 `;
 
 const Forecast = styled.div`
   position: relative;
   display: flex;
-  overflow-x: scroll;
+  overflow-x: hidden;
   overflow-y: hidden;
   scrollbar-color: lightgray #ffffff;
   scrollbar-width: thin;
   margin-top: 20px;
-  padding-bottom: 20px;
+
   @media ${device.laptop} {
     order: 4;
   }
@@ -186,19 +195,6 @@ const Result = ({ weather }) => {
     forecast,
   } = weather;
 
-  const forecasts = forecast.map((item) => (
-    <ForecastHour
-      key={item.dt}
-      temp={Math.floor(item.main.temp * 1) / 1}
-      icon={item.weather[0].icon}
-      month={item.dt_txt.slice(5, 7)}
-      day={item.dt_txt.slice(8, 10)}
-      hour={item.dt_txt.slice(11, 13) * 1}
-    />
-  ));
-
-  console.log(forecasts);
-
   let weatherIcon = null;
 
   if (main === "Thunderstorm") {
@@ -217,65 +213,107 @@ const Result = ({ weather }) => {
     weatherIcon = <FontAwesomeIcon icon={faSmog} />;
   }
 
+  const options = {
+    scale: 1.2,
+    speed: 1000,
+    max: 30,
+  };
+  const forecasts = forecast.map((item) => (
+    <Tilt
+      options={options}
+      style={{ flexShrink: 0, flexBasis: "140px", padding: "0 10px" }}
+    >
+      <ForecastHour
+        key={item.dt}
+        temp={Math.floor(item.main.temp * 1) / 1}
+        icon={item.weather[0].icon}
+        month={item.dt_txt.slice(5, 7)}
+        day={item.dt_txt.slice(8, 10)}
+        hour={item.dt_txt.slice(11, 13) * 1}
+      />
+    </Tilt>
+  ));
   return (
     <Results>
-      <CityDateWrapper>
-        <BigLabel>
-          {city}, {country}
-        </BigLabel>
-        <SmallLabel weight="400">{date}</SmallLabel>
-      </CityDateWrapper>
-      <CurrentWeatherWrapper>
-        <WeatherIcon>{weatherIcon}</WeatherIcon>
-        <TemperatureWrapper>
-          <Temperature>{Math.floor(temp)}&#176;</Temperature>
-          <SmallLabel weight="400" firstToUpperCase>
-            {description}
-          </SmallLabel>
-        </TemperatureWrapper>
-      </CurrentWeatherWrapper>
-      <WeatherDetailsWrapper>
-        <WeatherDetail>
-          <SmallLabel align="center" weight="400">
-            {Math.floor(highestTemp)}&#176;
-          </SmallLabel>
-          <Text align="center">Hight</Text>
-        </WeatherDetail>
-        <WeatherDetail>
-          <SmallLabel align="center" weight="400">
-            {wind}mph
-          </SmallLabel>
-          <Text align="center">Wind</Text>
-        </WeatherDetail>
-        <WeatherDetail>
-          <SmallLabel align="center" weight="400">
-            {sunrise}
-          </SmallLabel>
-          <Text align="center">Sunrise</Text>
-        </WeatherDetail>
-        <WeatherDetail>
-          <SmallLabel align="center" weight="400">
-            {Math.floor(lowestTemp)}&#176;
-          </SmallLabel>
-          <Text align="center">Low</Text>
-        </WeatherDetail>
-        <WeatherDetail>
-          <SmallLabel align="center" weight="400">
-            {humidity}%
-          </SmallLabel>
-          <Text align="center">Rain</Text>
-        </WeatherDetail>
-        <WeatherDetail>
-          <SmallLabel align="center" weight="400">
-            {sunset}
-          </SmallLabel>
-          <Text align="center">Sunset</Text>
-        </WeatherDetail>
-      </WeatherDetailsWrapper>
-      {/* <ForecastWrapper>
-        <MediumLabel weight="400">Forecast</MediumLabel>
-        <Forecast>{forecasts}</Forecast>
-      </ForecastWrapper> */}
+      <Tilt options={options} style={{ gridArea: "city" }}>
+        <CityDateWrapper>
+          <BigLabel>
+            {city}, {country}
+          </BigLabel>
+          <SmallLabel weight="400">{date}</SmallLabel>
+        </CityDateWrapper>
+      </Tilt>
+      <Tilt options={options} style={{ gridArea: "des" }}>
+        <CurrentWeatherWrapper>
+          <WeatherIcon>{weatherIcon}</WeatherIcon>
+          <TemperatureWrapper>
+            <Temperature>{Math.floor(temp)}&#176;</Temperature>
+            <SmallLabel weight="400" firstToUpperCase>
+              {description}
+            </SmallLabel>
+          </TemperatureWrapper>
+        </CurrentWeatherWrapper>
+      </Tilt>
+      <div style={{ gridArea: "details" }}>
+        <WeatherDetailsWrapper>
+          <Tilt options={options}>
+            <WeatherDetail>
+              <SmallLabel align="center" weight="400">
+                {Math.floor(highestTemp)}&#176;
+              </SmallLabel>
+              <Text align="center">High Temp</Text>
+            </WeatherDetail>
+          </Tilt>
+
+          <Tilt options={options}>
+            <WeatherDetail>
+              <SmallLabel align="center" weight="400">
+                {wind}mph
+              </SmallLabel>
+              <Text align="center">Wind</Text>
+            </WeatherDetail>
+          </Tilt>
+          <Tilt options={options}>
+            <WeatherDetail>
+              <SmallLabel align="center" weight="400">
+                {sunrise}
+              </SmallLabel>
+              <Text align="center">Sunrise</Text>
+            </WeatherDetail>
+          </Tilt>
+          <Tilt options={options}>
+            <WeatherDetail>
+              <SmallLabel align="center" weight="400">
+                {Math.floor(lowestTemp)}&#176;
+              </SmallLabel>
+              <Text align="center">Low Temp</Text>
+            </WeatherDetail>
+          </Tilt>
+          <Tilt options={options}>
+            <WeatherDetail>
+              <SmallLabel align="center" weight="400">
+                {humidity}%
+              </SmallLabel>
+              <Text align="center">Rain</Text>
+            </WeatherDetail>
+          </Tilt>
+          <Tilt options={options}>
+            <WeatherDetail>
+              <SmallLabel align="center" weight="400">
+                {sunset}
+              </SmallLabel>
+              <Text align="center">Sunset</Text>
+            </WeatherDetail>
+          </Tilt>
+        </WeatherDetailsWrapper>
+      </div>
+
+      <ForecastWrapper>
+        <SmallLabel font-weight={200}>HOURLY DATA</SmallLabel>
+        <Carousel focusOnSelect={true} itemsToShow={5} itemsToScroll={4}>
+          {forecasts}
+        </Carousel>
+      </ForecastWrapper>
     </Results>
   );
 };

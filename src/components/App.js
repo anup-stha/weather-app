@@ -1,182 +1,197 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import SearchCity from "./SearchCity";
 import device from "../responsive/Device";
 import Result from "./Result";
 import NotFound from "./NotFound";
 
-const AppTitle = styled.h1`
-  display: block;
-  height: 64px;
-  margin: 0;
-  padding: 20px 0;
-  font-size: 20px;
-  text-transform: uppercase;
-  font-weight: 400;
-  color: #ffffff;
-  transition: 0.3s 1.4s;
-  opacity: ${({ showLabel }) => (showLabel ? 1 : 0)};
+import axios from "axios";
 
-  ${({ secondary }) =>
-    secondary &&
-    `
-    opacity: 1;
-    height: auto;
-    position: relative;
-    padding: 20px 0;
-    font-size: 30px;
-    top: 20%;
-    text-align: center;
-    transition: .5s;
-    @media ${device.tablet} {
-      font-size: 40px;
-    }
-    @media ${device.laptop} {
-      font-size: 50px;
-    }
-    @media ${device.laptopL} {
-      font-size: 60px;
-    }
-    @media ${device.desktop} {
-      font-size: 70px;
-    }
-    
-  `}
+import { months, days } from "./date";
+
+const MainWrapper = styled.div`
+  min-height: 100vh;
+  background: rgb(18, 16, 55);
+  background: linear-gradient(
+    90deg,
+    rgba(18, 16, 55, 1) 0%,
+    rgba(13, 13, 79, 1) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const InsideWrapper = styled.div`
+  background: white;
+  min-height: 80vh;
+  max-height: 80vh;
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: linear-gradient(
+    to right bottom,
+    rgba(255, 255, 255, 0.7),
+    rgba(255, 255, 255, 0.1)
+  );
+  border-radius: 1rem;
+  z-index: 3;
+  backdrop-filter: blur(1rem);
+  filter: drop-shadow(0px 30px 30px rgba(0, 0, 0, 0.3));
+  transition: all 1s ease;
+`;
+
+const Circle = styled.div`
+  background: white;
+  background: linear-gradient(
+    to right bottom,
+    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0.3)
+  );
+  height: 10rem;
+  width: 10rem;
+  position: absolute;
+  top: ${(props) => props.top}%;
+  left: ${(props) => props.left}%;
+  right: ${(props) => props.right}%;
+  bottom: ${(props) => props.bottom}%;
+  border-radius: 50%;
+  transition: all 1s ease;
+`;
+
+const HeaderWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: ${(props) => (props.showResult ? "row" : "column")};
+  margin-top: 2%;
+  margin-bottom: 2%;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 1s ease;
+  padding: 0 40px;
 
   ${({ showResult }) =>
-    showResult &&
+    !showResult &&
     `
-    opacity: 0;
-    visibility: hidden;
-    top: 10%;
+    min-height:80vh;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   `}
 `;
 
-const WeatherWrapper = styled.div`
-  max-width: 1500px;
-  margin: 0 auto;
-  height: calc(100vh - 64px);
-  width: 100%;
-  position: relative;
+const AppTitle = styled.h1`
+  color: #fff;
+  font-weight: normal;
+  font-size: ${(props) => (props.showResult ? "1.7rem" : "4rem")};
+  text-shadow: horizontal-offset vertical-offset blur color;
+  text-shadow: 2px 4px 3px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.2em;
+
+  @keyframes slideInLeft {
+    0% {
+      transform: scale(1);
+    }
+
+    50% {
+      transform: scale(0.7);
+    }
+
+    100% {
+      transform: scale(1);
+    }
+  }
+  animation: 1s ease slideInLeft;
+  transition: font-size ease 1s;
 `;
 
-class App extends React.Component {
-  state = {
-    value: "",
-    weatherInfo: null,
-    error: false,
+const NewApp = () => {
+  const [value, setValue] = useState("");
+  const [weatherInfo, setWeatherInfo] = useState(null);
+  const [error, setError] = useState(false);
+
+  const handleInputChange = (e) => {
+    setValue(e.target.value);
   };
 
-  handleInputChange = (e) => {
-    this.setState({
-      value: e.target.value,
-    });
-  };
-
-  handleSearchCity = (e) => {
+  const handleSearchCity = async (e) => {
     e.preventDefault();
-    const { value } = this.state;
-    const APIkey = process.env.API_KEY;
+    try {
+      const key = "f378cbad832572ab972b48c586b5b463";
+      const currentResponse = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?q=${value}&APPID=${key}&units=metric`
+      );
+      const hourResponse = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?q=${value}&APPID=f378cbad832572ab972b48c586b5b463&units=metric`
+      );
 
-    const weather = `https://api.openweathermap.org/data/2.5/weather?q=${value}&APPID=f378cbad832572ab972b48c586b5b463&units=metric`;
-    const forecast = `https://api.openweathermap.org/data/2.5/forecast?q=${value}&APPID=f378cbad832572ab972b48c586b5b463&units=metric`;
+      const currentData = currentResponse.data;
+      console.log(currentData);
+      const hourData = hourResponse.data;
 
-    Promise.all([fetch(weather), fetch(forecast)])
-      .then(([res1, res2]) => {
-        if (res1.ok && res2.ok) {
-          return Promise.all([res1.json(), res2.json()]);
-        }
-        throw Error(res1.statusText, res2.statusText);
-      })
-      .then(([data1, data2]) => {
-        const months = [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "Nocvember",
-          "December",
-        ];
-        const days = [
-          "Sunday",
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-        ];
-        const currentDate = new Date();
-        const date = `${days[currentDate.getDay()]} ${currentDate.getDate()} ${
-          months[currentDate.getMonth()]
-        }`;
-        const sunset = new Date(data1.sys.sunset * 1000)
-          .toLocaleTimeString()
-          .slice(0, 5);
-        const sunrise = new Date(data1.sys.sunrise * 1000)
-          .toLocaleTimeString()
-          .slice(0, 5);
+      const currentDate = new Date();
+      const date = `${days[currentDate.getDay()]} ${currentDate.getDate()} ${
+        months[currentDate.getMonth()]
+      }`;
+      const sunset = new Date(currentData.sys.sunset * 1000)
+        .toLocaleTimeString()
+        .slice(0, 5);
+      const sunrise = new Date(currentData.sys.sunrise * 1000)
+        .toLocaleTimeString()
+        .slice(0, 5);
+      const weatherInfoData = {
+        city: currentData.name,
+        country: currentData.sys.country,
+        date,
+        description: currentData.weather[0].description,
+        main: currentData.weather[0].main,
+        temp: currentData.main.temp,
+        highestTemp: currentData.main.temp_max,
+        lowestTemp: currentData.main.temp_min,
+        sunrise,
+        sunset,
+        clouds: currentData.clouds.all,
+        humidity: currentData.main.humidity,
+        wind: currentData.wind.speed,
+        forecast: hourData.list,
+      };
 
-        const weatherInfo = {
-          city: data1.name,
-          country: data1.sys.country,
-          date,
-          description: data1.weather[0].description,
-          main: data1.weather[0].main,
-          temp: data1.main.temp,
-          highestTemp: data1.main.temp_max,
-          lowestTemp: data1.main.temp_min,
-          sunrise,
-          sunset,
-          clouds: data1.clouds.all,
-          humidity: data1.main.humidity,
-          wind: data1.wind.speed,
-          forecast: data2.list,
-        };
-        this.setState({
-          weatherInfo,
-          error: false,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-
-        this.setState({
-          error: true,
-          weatherInfo: null,
-        });
-      });
+      setWeatherInfo(weatherInfoData);
+      setError(false);
+    } catch (error) {
+      setError(true);
+      setWeatherInfo(null);
+    }
   };
+  console.log((weatherInfo || error) && true);
 
-  render() {
-    const { value, weatherInfo, error } = this.state;
-    return (
-      <>
-        <AppTitle showLabel={(weatherInfo || error) && true}>
-          Weather app
-        </AppTitle>
-        <WeatherWrapper>
-          <AppTitle secondary showResult={(weatherInfo || error) && true}>
-            Weather app
-          </AppTitle>
-          <SearchCity
-            value={value}
-            showResult={(weatherInfo || error) && true}
-            change={this.handleInputChange}
-            submit={this.handleSearchCity}
-          />
+  return (
+    <>
+      <MainWrapper>
+        <InsideWrapper>
+          <HeaderWrapper showResult={(weatherInfo || error) && true}>
+            <AppTitle showResult={(weatherInfo || error) && true}>
+              WEATHER FORECAST
+            </AppTitle>
+
+            <SearchCity
+              value={value}
+              showResult={(weatherInfo || error) && true}
+              change={handleInputChange}
+              submit={handleSearchCity}
+            />
+          </HeaderWrapper>
           {weatherInfo && <Result weather={weatherInfo} />}
           {error && <NotFound error={error} />}
-        </WeatherWrapper>
-      </>
-    );
-  }
-}
+        </InsideWrapper>
+        <Circle top="5" right="10" />
+        <Circle bottom="5" left="10" />
+      </MainWrapper>
+    </>
+  );
+};
 
-export default App;
+export default NewApp;
